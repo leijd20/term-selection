@@ -1,0 +1,32 @@
+{
+  "root": ".",
+  "proposer": "heuristic",
+  "evaluator": "mock",
+  "budget": {
+    "max_steps": 5,
+    "max_evals": 20,
+    "max_bundle_size": 3,
+    "parallel_k": 3,
+    "min_commit_delta": 0.05
+  },
+  "initial_state": {
+    "active_terms": ["ai"],
+    "candidate_terms": ["acid1", "base1", "normalx", "topoVector", "acid2", "base2"],
+    "current_model_ref": "models/baseline",
+    "uwrms": 2.13,
+    "validation_uwrms": 2.18
+  },
+  "llm": {
+    "base_url": "http://192.168.18.16:18000/v1",
+    "api_key": "sk-Z3r1zL77P7xYlNfIGxWTFpobtChNd6FQ3LuPDBQPRkiuJeK6",
+    "model": "DeepSeek-V4-Flash",
+    "timeout": 60.0,
+    "temperature": 0.2
+  },
+  "pangen_minimal": {
+    "backend": "auto",
+    "ga_rounds": 3,
+    "pop_size": 20,
+    "seed": 10
+  }
+}

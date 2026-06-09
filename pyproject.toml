@@ -1,0 +1,9 @@
+[project]
+name = "term-agent"
+version = "0.1.0"
+description = "Minimal term selection agent runtime"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
