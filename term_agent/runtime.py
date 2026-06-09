@@ -101,6 +101,7 @@ def build_evaluator(config: RuntimeConfig) -> Evaluator:
                 "backend": config.pangen_minimal.backend,
                 "pangen_path": config.pangen_minimal.pangen_path,
                 "gateway": config.pangen_minimal.gateway,
+                "timeout_sec": config.pangen_minimal.timeout_sec,
                 "ga_rounds": config.pangen_minimal.ga_rounds,
                 "pop_size": config.pangen_minimal.pop_size,
                 "seed": config.pangen_minimal.seed,

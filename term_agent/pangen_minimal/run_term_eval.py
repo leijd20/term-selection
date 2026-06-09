@@ -73,6 +73,7 @@ def evaluate_term_set(
             backend=backend,
             pangen_path=str((case_inputs or {}).get("pangen_path", "")),
             gateway=str((case_inputs or {}).get("gateway", "")),
+            timeout_sec=int((case_inputs or {}).get("timeout_sec", 3600)),
             ga_rounds=request.ga_rounds,
             pop_size=request.pop_size,
         ),

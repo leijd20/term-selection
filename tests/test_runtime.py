@@ -137,6 +137,29 @@ class PanGenMinimalTest(unittest.TestCase):
             self.assertEqual(result.diagnostics["pangen"], True)
             self.assertLess(result.metrics.uwrms, 2.13)
 
+    def test_binary_backend_missing_pangen_fails_fast(self):
+        from tempfile import TemporaryDirectory
+
+        from term_agent.pangen_minimal.direct_launcher import DirectPanGenConfig, run_direct_pangen
+
+        with TemporaryDirectory() as tmp:
+            with self.assertRaises(FileNotFoundError):
+                run_direct_pangen(
+                    run_dir=tmp,
+                    eval_input={
+                        "base_model_ref": "model0",
+                        "base_terms": ["ai"],
+                        "target_terms": ["ai", "acid1"],
+                        "base_uwrms": 2.0,
+                    },
+                    config=DirectPanGenConfig(
+                        backend="binary",
+                        pangen_path="/missing/pangen",
+                        gateway="127.0.0.1:4730",
+                        timeout_sec=1,
+                    ),
+                )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -42,9 +42,18 @@ with:
 "pangen_minimal": {
   "backend": "binary",
   "pangen_path": "/data/pangen/pangen_2026.04.00.release",
-  "gateway": "192.168.18.116:4730"
+  "gateway": "192.168.18.116:4730",
+  "timeout_sec": 3600
 }
 ```
+
+Binary mode writes PanGen process logs into the eval run directory:
+
+- `pangen_stdout.log`
+- `pangen_stderr.log`
+
+Non-zero PanGen exit codes and timeout are raised immediately instead of waiting
+for `term_eval_result.json` forever.
 
 Use an OpenAI-compatible LLM endpoint:
 

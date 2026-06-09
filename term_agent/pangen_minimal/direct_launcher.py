@@ -29,6 +29,7 @@ class DirectPanGenConfig:
     backend: str = "auto"  # auto | binary | embedded | local
     pangen_path: str = ""
     gateway: str = ""
+    timeout_sec: int = 3600
 
 
 def run_direct_pangen(
@@ -175,15 +176,15 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
             pangen_bin=str(pangen_bin),
             gateway=config.gateway,
         )
-        subprocess.run(
+        _run_with_logs(
             ["bash", "-lc", command],
-            cwd=str(run_dir),
+            run_dir=run_dir,
             env=env,
-            check=True,
+            timeout_sec=config.timeout_sec,
         )
         return
 
-    subprocess.run(
+    _run_with_logs(
         [
             str(pangen_bin),
             "-script", "direct_pframe.py",
@@ -192,10 +193,39 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
             ),
             "-g", config.gateway,
         ],
-        cwd=str(run_dir),
+        run_dir=run_dir,
         env=env,
-        check=True,
+        timeout_sec=config.timeout_sec,
     )
+
+
+def _run_with_logs(command: list[str], *, run_dir: Path, env: dict[str, str], timeout_sec: int) -> None:
+    stdout_path = run_dir / "pangen_stdout.log"
+    stderr_path = run_dir / "pangen_stderr.log"
+    with stdout_path.open("w", encoding="utf-8", errors="replace") as stdout, \
+            stderr_path.open("w", encoding="utf-8", errors="replace") as stderr:
+        try:
+            completed = subprocess.run(
+                command,
+                cwd=str(run_dir),
+                env=env,
+                stdout=stdout,
+                stderr=stderr,
+                timeout=timeout_sec,
+                check=False,
+            )
+        except subprocess.TimeoutExpired as exc:
+            raise TimeoutError(
+                "PanGen binary timed out after {0}s. Logs: {1}, {2}".format(
+                    timeout_sec, stdout_path, stderr_path
+                )
+            ) from exc
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "PanGen binary exited with code {0}. Logs: {1}, {2}".format(
+                completed.returncode, stdout_path, stderr_path
+            )
+        )
 
 
 def main() -> None:
@@ -205,6 +235,7 @@ def main() -> None:
     parser.add_argument("--backend", choices=["auto", "binary", "embedded", "local"], default="auto")
     parser.add_argument("--pangen-path", default="")
     parser.add_argument("--gateway", default="")
+    parser.add_argument("--timeout-sec", type=int, default=3600)
     args = parser.parse_args()
 
     eval_input = json.loads(Path(args.input_json).read_text(encoding="utf-8"))
@@ -215,6 +246,7 @@ def main() -> None:
             backend=args.backend,
             pangen_path=args.pangen_path,
             gateway=args.gateway,
+            timeout_sec=args.timeout_sec,
         ),
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))
