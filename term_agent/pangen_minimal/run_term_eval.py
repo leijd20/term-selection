@@ -71,6 +71,8 @@ def evaluate_term_set(
         eval_input=asdict(request),
         config=DirectPanGenConfig(
             backend=backend,
+            pangen_path=str((case_inputs or {}).get("pangen_path", "")),
+            gateway=str((case_inputs or {}).get("gateway", "")),
             ga_rounds=request.ga_rounds,
             pop_size=request.pop_size,
         ),
@@ -101,7 +103,9 @@ def main() -> None:
     parser.add_argument("--base-uwrms", type=float, required=True)
     parser.add_argument("--base-terms", nargs="*", default=[])
     parser.add_argument("--target-terms", nargs="+", required=True)
-    parser.add_argument("--backend", choices=["auto", "pangen", "local"], default="auto")
+    parser.add_argument("--backend", choices=["auto", "binary", "embedded", "local"], default="auto")
+    parser.add_argument("--pangen-path", default="")
+    parser.add_argument("--gateway", default="")
     args = parser.parse_args()
 
     result = evaluate_term_set(
@@ -110,6 +114,7 @@ def main() -> None:
         base_terms=args.base_terms,
         target_terms=args.target_terms,
         base_uwrms=args.base_uwrms,
+        case_inputs={"pangen_path": args.pangen_path, "gateway": args.gateway},
         backend=args.backend,
     )
     print(json.dumps(result, indent=2, ensure_ascii=False))

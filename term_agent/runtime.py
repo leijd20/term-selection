@@ -99,6 +99,8 @@ def build_evaluator(config: RuntimeConfig) -> Evaluator:
             work_root=Path(config.root),
             case_inputs={
                 "backend": config.pangen_minimal.backend,
+                "pangen_path": config.pangen_minimal.pangen_path,
+                "gateway": config.pangen_minimal.gateway,
                 "ga_rounds": config.pangen_minimal.ga_rounds,
                 "pop_size": config.pangen_minimal.pop_size,
                 "seed": config.pangen_minimal.seed,

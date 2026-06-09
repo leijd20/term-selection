@@ -28,6 +28,24 @@ local synthetic GA fallback:
 python -m term_agent.runtime --config config.example.json --evaluator pangen_minimal
 ```
 
+Force PanGen binary mode:
+
+```bash
+python -m term_agent.runtime ^
+  --config config.example.json ^
+  --evaluator pangen_minimal
+```
+
+with:
+
+```json
+"pangen_minimal": {
+  "backend": "binary",
+  "pangen_path": "/data/pangen/pangen_2026.04.00.release",
+  "gateway": "192.168.18.116:4730"
+}
+```
+
 Use an OpenAI-compatible LLM endpoint:
 
 ```bash
@@ -105,12 +123,18 @@ the real low-level PanGen calls when the minimum session sequence is settled.
 There is also a direct PanGen path:
 
 - `term_agent/pangen_minimal/direct_launcher.py`
-- `term_agent/pangen_minimal/direct_task.py`
+- `term_agent/pangen_minimal/pangen_scripts.py`
 
 This path does not use ArcGen `wizard.json` and does not import
-`fit_amc_model.py`. `direct_launcher.py` builds PanGen `options` directly.
-`direct_task.py` is the small PanGen `python_file` where the GA lifecycle hooks
-must be implemented.
+`fit_amc_model.py`. The main package runs on modern Python. For PanGen binary
+mode, `direct_launcher.py` writes low-version-compatible `direct_pframe.py` and
+`direct_task.py` into the run directory, then calls:
+
+```bash
+${pangen_path}/bin/pangen -script direct_pframe.py -e "..." -g ${gateway}
+```
+
+Only the generated scripts are executed by PanGen's bundled Python.
 
 The first implementation is synthetic:
 

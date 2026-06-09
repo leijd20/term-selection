@@ -45,6 +45,8 @@ class InitialStateConfig:
 @dataclass
 class PanGenMinimalConfig:
     backend: str = "auto"
+    pangen_path: str = ""
+    gateway: str = ""
     ga_rounds: int = 3
     pop_size: int = 20
     seed: int = 10
