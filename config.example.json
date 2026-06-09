@@ -24,7 +24,7 @@
     "temperature": 0.2
   },
   "pangen_minimal": {
-    "backend": "local",
+    "backend": "auto",
     "pangen_path": "/data/pangen/pangen_2026.04.00.release",
     "gateway": "192.168.18.116:4730",
     "timeout_sec": 3600,
