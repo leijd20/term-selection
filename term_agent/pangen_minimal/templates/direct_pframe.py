@@ -18,6 +18,9 @@ def PanGenFlow():
         "ga_total_rounds": str(cfg.get("ga_rounds", 3)),
         "pop_size": str(cfg.get("pop_size", 20)),
     }
+    if cfg.get("remote_shell"):
+        options["remote_shell"] = cfg.get("remote_shell")
+    options.update(cfg.get("session_options", {}))
     psys.execute_session(
         "ga",
         mode=cfg.get("mode", "distributed"),

@@ -55,6 +55,8 @@ class PanGenMinimalConfig:
     worker_count: int = 1
     preprocess_threads: int = 4
     use_gpu: bool = True
+    remote_shell: str = ""
+    session_options: dict[str, Any] = field(default_factory=dict)
     case_inputs: dict[str, Any] = field(default_factory=dict)
     model_inputs: dict[str, Any] = field(default_factory=dict)
     term_specs: dict[str, Any] = field(default_factory=dict)

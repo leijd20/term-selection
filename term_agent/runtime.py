@@ -109,6 +109,8 @@ def build_evaluator(config: RuntimeConfig) -> Evaluator:
                 "worker_count": config.pangen_minimal.worker_count,
                 "preprocess_threads": config.pangen_minimal.preprocess_threads,
                 "use_gpu": config.pangen_minimal.use_gpu,
+                "remote_shell": config.pangen_minimal.remote_shell,
+                "session_options": config.pangen_minimal.session_options,
                 "case_inputs": config.pangen_minimal.case_inputs,
                 "model_inputs": config.pangen_minimal.model_inputs,
                 "term_specs": config.pangen_minimal.term_specs,

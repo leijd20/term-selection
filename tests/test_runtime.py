@@ -145,6 +145,34 @@ class PanGenMinimalTest(unittest.TestCase):
             self.assertEqual(payload["term_specs"]["acid1"]["operation"], "Ax")
             self.assertEqual(payload["variables"][0]["name"], "acid1_coeff")
 
+    def test_pangen_config_carries_worker_and_session_options(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import json
+
+        from term_agent.pangen_minimal.run_term_eval import evaluate_term_set
+
+        with TemporaryDirectory() as tmp:
+            evaluate_term_set(
+                work_root=tmp,
+                base_model_ref="model0",
+                base_terms=["ai"],
+                target_terms=["ai", "acid1"],
+                base_uwrms=2.0,
+                case_inputs={
+                    "worker_nodes": {"node2": "192.168.18.116"},
+                    "remote_shell": "ssh",
+                    "session_options": {"use_job_manager": 1, "submit_type": "LSF"},
+                },
+                backend="local",
+            )
+
+            run_dir = next((Path(tmp) / "pangen_runs").glob("eval_*"))
+            cfg = json.loads((run_dir / "direct_pangen_config.json").read_text())
+            self.assertEqual(cfg["worker_nodes"]["node2"], "192.168.18.116")
+            self.assertEqual(cfg["remote_shell"], "ssh")
+            self.assertEqual(cfg["session_options"]["submit_type"], "LSF")
+
     def test_pangen_evaluator_uses_minimal_boundary(self):
         from tempfile import TemporaryDirectory
 

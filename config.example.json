@@ -37,6 +37,8 @@
     "worker_count": 1,
     "preprocess_threads": 4,
     "use_gpu": true,
+    "remote_shell": "",
+    "session_options": {},
     "case_inputs": {
       "gauge_file": "",
       "gds_file": "",

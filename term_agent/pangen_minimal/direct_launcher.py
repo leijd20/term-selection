@@ -23,6 +23,8 @@ class DirectPanGenConfig:
     worker_count: int = 1
     preprocess_threads: int = 4
     use_gpu: bool = True
+    remote_shell: str = ""
+    session_options: dict[str, Any] = field(default_factory=dict)
     ga_rounds: int = 3
     pop_size: int = 20
     mode: str = "distributed"
@@ -111,6 +113,9 @@ def _execute_pangen_sessions(run_dir: Path, config: DirectPanGenConfig) -> None:
             "ga_total_rounds": str(config.ga_rounds),
             "pop_size": str(config.pop_size),
         }
+        if config.remote_shell:
+            options["remote_shell"] = config.remote_shell
+        options.update(config.session_options)
         psys.execute_session(
             "ga",
             mode=config.mode,
@@ -157,12 +162,13 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
         str(lib_path / "python3.4" / "lib-dynload"),
         str(lib_path / "python3.4" / "site-packages"),
         str(pangen_root / "script"),
+        str(run_dir),
     ]
     env = os.environ.copy()
     env["PYTHONPATH"] = os.pathsep.join(
         [env.get("PYTHONPATH", "")] + python_paths
     ).strip(os.pathsep)
-    env["LD_LIBRARY_PATH"] = str(lib_path)
+    env["LD_LIBRARY_PATH"] = os.pathsep.join([str(lib_path), str(lib_path / "sys_lib")])
 
     auto_setting = pangen_root / "shell" / "auto_setting.bash"
     if os.name != "nt" and auto_setting.exists():
@@ -177,6 +183,7 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
             pangen_bin=str(pangen_bin),
             gateway=config.gateway,
         )
+        _write_launch_debug(run_dir, command, env)
         _run_with_logs(
             ["bash", "-lc", command],
             run_dir=run_dir,
@@ -185,15 +192,17 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
         )
         return
 
+    cmd = [
+        str(pangen_bin),
+        "-script", "direct_pframe.py",
+        "-e", "PYTHONPATH={0} LD_LIBRARY_PATH={1}".format(
+            env["PYTHONPATH"], env["LD_LIBRARY_PATH"]
+        ),
+        "-g", config.gateway,
+    ]
+    _write_launch_debug(run_dir, " ".join(cmd), env)
     _run_with_logs(
-        [
-            str(pangen_bin),
-            "-script", "direct_pframe.py",
-            "-e", "PYTHONPATH={0} LD_LIBRARY_PATH={1}".format(
-                env["PYTHONPATH"], env["LD_LIBRARY_PATH"]
-            ),
-            "-g", config.gateway,
-        ],
+        cmd,
         run_dir=run_dir,
         env=env,
         timeout_sec=config.timeout_sec,
@@ -235,6 +244,18 @@ def _run_with_logs(command: list[str], *, run_dir: Path, env: dict[str, str], ti
                 completed.returncode, stdout_path, stderr_path
             )
         )
+
+
+def _write_launch_debug(run_dir: Path, command: str, env: dict[str, str]) -> None:
+    payload = {
+        "command": command,
+        "PYTHONPATH": env.get("PYTHONPATH", ""),
+        "LD_LIBRARY_PATH": env.get("LD_LIBRARY_PATH", ""),
+    }
+    (run_dir / "pangen_launch.json").write_text(
+        json.dumps(payload, indent=2, ensure_ascii=False),
+        encoding="utf-8",
+    )
 
 
 def main() -> None:

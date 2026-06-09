@@ -84,6 +84,8 @@ def evaluate_term_set(
             worker_count=int((case_inputs or {}).get("worker_count", 1)),
             preprocess_threads=int((case_inputs or {}).get("preprocess_threads", 4)),
             use_gpu=bool((case_inputs or {}).get("use_gpu", True)),
+            remote_shell=str((case_inputs or {}).get("remote_shell", "")),
+            session_options=dict((case_inputs or {}).get("session_options", {})),
         ),
     )
     _write_json(run_dir / "result.json", result)
