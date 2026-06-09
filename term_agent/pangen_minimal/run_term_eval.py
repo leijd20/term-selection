@@ -17,6 +17,8 @@ class TermEvalInput:
     target_terms: list[str]
     base_uwrms: float
     case_inputs: dict[str, Any] = field(default_factory=dict)
+    model_inputs: dict[str, Any] = field(default_factory=dict)
+    term_specs: dict[str, Any] = field(default_factory=dict)
     variables: list[dict[str, Any]] = field(default_factory=list)
     ga_rounds: int = 3
     pop_size: int = 20
@@ -57,7 +59,9 @@ def evaluate_term_set(
         base_terms=sorted(base_terms),
         target_terms=sorted(target_terms),
         base_uwrms=base_uwrms,
-        case_inputs=case_inputs or {},
+        case_inputs=(case_inputs or {}).get("case_inputs", {}),
+        model_inputs=(case_inputs or {}).get("model_inputs", {}),
+        term_specs=(case_inputs or {}).get("term_specs", {}),
         variables=(case_inputs or {}).get("variables", []),
         ga_rounds=int((case_inputs or {}).get("ga_rounds", 3)),
         pop_size=int((case_inputs or {}).get("pop_size", 20)),
@@ -76,6 +80,10 @@ def evaluate_term_set(
             timeout_sec=int((case_inputs or {}).get("timeout_sec", 3600)),
             ga_rounds=request.ga_rounds,
             pop_size=request.pop_size,
+            worker_nodes=dict((case_inputs or {}).get("worker_nodes", {})),
+            worker_count=int((case_inputs or {}).get("worker_count", 1)),
+            preprocess_threads=int((case_inputs or {}).get("preprocess_threads", 4)),
+            use_gpu=bool((case_inputs or {}).get("use_gpu", True)),
         ),
     )
     _write_json(run_dir / "result.json", result)

@@ -115,6 +115,36 @@ class PanGenMinimalTest(unittest.TestCase):
             self.assertEqual(result["status"], "success")
             self.assertLess(result["uwrms"], 2.0)
 
+    def test_full_eval_inputs_are_written_to_contract(self):
+        from pathlib import Path
+        from tempfile import TemporaryDirectory
+        import json
+
+        from term_agent.pangen_minimal.run_term_eval import evaluate_term_set
+
+        with TemporaryDirectory() as tmp:
+            evaluate_term_set(
+                work_root=tmp,
+                base_model_ref="model0",
+                base_terms=["ai"],
+                target_terms=["ai", "acid1"],
+                base_uwrms=2.0,
+                case_inputs={
+                    "case_inputs": {"gauge_file": "gauge.txt", "tcc_dir": ".tccfiles"},
+                    "model_inputs": {"base_model_yaml": "model.yaml"},
+                    "term_specs": {"acid1": {"operation": "Ax"}},
+                    "variables": [{"name": "acid1_coeff", "type": "real", "lower": -1, "upper": 1}],
+                },
+                backend="local",
+            )
+
+            run_dir = next((Path(tmp) / "pangen_runs").glob("eval_*"))
+            payload = json.loads((run_dir / "term_eval_input.json").read_text())
+            self.assertEqual(payload["case_inputs"]["gauge_file"], "gauge.txt")
+            self.assertEqual(payload["model_inputs"]["base_model_yaml"], "model.yaml")
+            self.assertEqual(payload["term_specs"]["acid1"]["operation"], "Ax")
+            self.assertEqual(payload["variables"][0]["name"], "acid1_coeff")
+
     def test_pangen_evaluator_uses_minimal_boundary(self):
         from tempfile import TemporaryDirectory
 

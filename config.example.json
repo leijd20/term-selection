@@ -24,12 +24,54 @@
     "temperature": 0.2
   },
   "pangen_minimal": {
-    "backend": "auto",
+    "backend": "local",
     "pangen_path": "/data/pangen/pangen_2026.04.00.release",
     "gateway": "192.168.18.116:4730",
     "timeout_sec": 3600,
     "ga_rounds": 3,
     "pop_size": 20,
-    "seed": 10
+    "seed": 10,
+    "worker_nodes": {
+      "node1": "192.168.18.116"
+    },
+    "worker_count": 1,
+    "preprocess_threads": 4,
+    "use_gpu": true,
+    "case_inputs": {
+      "gauge_file": "",
+      "gds_file": "",
+      "layers": {},
+      "tcc_dir": "",
+      "calibration_split": "",
+      "validation_split": ""
+    },
+    "model_inputs": {
+      "base_model_yaml": "",
+      "source": {},
+      "mask": {},
+      "optics": {},
+      "film": {}
+    },
+    "term_specs": {
+      "acid1": {
+        "operation": "Ax",
+        "input": ["ai"],
+        "parameters": {
+          "coeff": [-1.0, 1.0],
+          "sigma": [10.0, 80.0],
+          "truncation": [0.5, 2.0]
+        }
+      },
+      "base1": {
+        "operation": "Bx",
+        "input": ["ai"],
+        "parameters": {
+          "coeff": [-1.0, 1.0],
+          "sigma": [10.0, 80.0],
+          "truncation": [0.5, 2.0]
+        }
+      }
+    },
+    "variables": []
   }
 }

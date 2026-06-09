@@ -151,3 +151,26 @@ The first implementation is synthetic:
 - `direct_launcher.py` uses PanGen when importable, otherwise falls back to a
   local synthetic GA loop.
 - This validates the boundary before replacing `objective()` with real RMS.
+
+## Evaluation Inputs
+
+`pangen_minimal` now carries the real-evaluation input contract, even though the
+current objective is synthetic. These fields are written to
+`term_eval_input.json` for `direct_task.py`:
+
+- `base_model_ref`
+- `base_terms`
+- `target_terms`
+- `base_uwrms`
+- `case_inputs`
+- `model_inputs`
+- `term_specs`
+- `variables`
+- `ga_rounds`
+- `pop_size`
+- `seed`
+
+`case_inputs` is intended for gauge/GDS/layer/TCC/split data. `model_inputs` is
+intended for base model, source, mask, optics, and film settings. `term_specs`
+describes operations, input channels, and parameter ranges per term. `variables`
+can override the default `{term}_coeff + threshold` search space.

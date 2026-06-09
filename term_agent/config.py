@@ -51,6 +51,14 @@ class PanGenMinimalConfig:
     ga_rounds: int = 3
     pop_size: int = 20
     seed: int = 10
+    worker_nodes: dict[str, str] = field(default_factory=dict)
+    worker_count: int = 1
+    preprocess_threads: int = 4
+    use_gpu: bool = True
+    case_inputs: dict[str, Any] = field(default_factory=dict)
+    model_inputs: dict[str, Any] = field(default_factory=dict)
+    term_specs: dict[str, Any] = field(default_factory=dict)
+    variables: list[dict[str, Any]] = field(default_factory=list)
 
 
 @dataclass

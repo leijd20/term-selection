@@ -105,6 +105,14 @@ def build_evaluator(config: RuntimeConfig) -> Evaluator:
                 "ga_rounds": config.pangen_minimal.ga_rounds,
                 "pop_size": config.pangen_minimal.pop_size,
                 "seed": config.pangen_minimal.seed,
+                "worker_nodes": config.pangen_minimal.worker_nodes,
+                "worker_count": config.pangen_minimal.worker_count,
+                "preprocess_threads": config.pangen_minimal.preprocess_threads,
+                "use_gpu": config.pangen_minimal.use_gpu,
+                "case_inputs": config.pangen_minimal.case_inputs,
+                "model_inputs": config.pangen_minimal.model_inputs,
+                "term_specs": config.pangen_minimal.term_specs,
+                "variables": config.pangen_minimal.variables,
             },
         )
     return MockEvaluator()
