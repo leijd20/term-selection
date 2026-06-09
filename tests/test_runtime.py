@@ -190,6 +190,31 @@ class PanGenMinimalTest(unittest.TestCase):
                     ),
                 )
 
+    def test_auto_backend_missing_pangen_falls_back_local(self):
+        from tempfile import TemporaryDirectory
+
+        from term_agent.pangen_minimal.direct_launcher import DirectPanGenConfig, run_direct_pangen
+
+        with TemporaryDirectory() as tmp:
+            result = run_direct_pangen(
+                run_dir=tmp,
+                eval_input={
+                    "base_model_ref": "model0",
+                    "base_terms": ["ai"],
+                    "target_terms": ["ai", "acid1"],
+                    "base_uwrms": 2.0,
+                },
+                config=DirectPanGenConfig(
+                    backend="auto",
+                    pangen_path="/missing/pangen",
+                    gateway="127.0.0.1:4730",
+                    timeout_sec=1,
+                ),
+            )
+
+            self.assertEqual(result["status"], "success")
+            self.assertEqual(result["diagnostics"]["backend"], "local_synthetic_ga")
+
 
 if __name__ == "__main__":
     unittest.main()

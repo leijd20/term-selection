@@ -73,7 +73,8 @@ def _execute_pangen_sessions(run_dir: Path, config: DirectPanGenConfig) -> None:
     If backend is local, run a local synthetic GA without PanGen.
     If backend is binary, call the PanGen binary with generated direct_pframe.py.
     If backend is embedded, import pangen.system in the current interpreter.
-    If backend is auto, prefer binary when configured, then embedded, then local.
+    If backend is auto, use binary only when the configured binary exists,
+    then embedded, then local.
     """
     if config.backend not in ("auto", "binary", "embedded", "pangen", "local"):
         raise ValueError("backend must be auto, binary, embedded, pangen, or local")
@@ -86,7 +87,7 @@ def _execute_pangen_sessions(run_dir: Path, config: DirectPanGenConfig) -> None:
         _execute_pangen_binary(run_dir, config)
         return
 
-    if config.backend == "auto" and config.pangen_path and config.gateway:
+    if config.backend == "auto" and _has_pangen_binary(config):
         _execute_pangen_binary(run_dir, config)
         return
 
@@ -197,6 +198,14 @@ def _execute_pangen_binary(run_dir: Path, config: DirectPanGenConfig) -> None:
         env=env,
         timeout_sec=config.timeout_sec,
     )
+
+
+def _has_pangen_binary(config: DirectPanGenConfig) -> bool:
+    if not config.pangen_path or not config.gateway:
+        return False
+    pangen_root = Path(config.pangen_path)
+    pangen_bin = pangen_root / "bin" / ("pangen.exe" if os.name == "nt" else "pangen")
+    return pangen_bin.exists()
 
 
 def _run_with_logs(command: list[str], *, run_dir: Path, env: dict[str, str], timeout_sec: int) -> None:
